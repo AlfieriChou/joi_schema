@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const _ = require('lodash')
 
 const props = {
   id: Joi.number().integer().description('id'),
@@ -23,7 +24,7 @@ module.exports = {
         body: Joi.object({
           code: Joi.number().description('返回标识'),
           message: Joi.string().description('接口描述'),
-          data: Joi.array().items(props).description('返回结果')
+          data: Joi.array().items(_.omit(props, ['password'])).description('返回结果')
         }).options({
           allowUnknown: true
         }).description('返回用户列表')
