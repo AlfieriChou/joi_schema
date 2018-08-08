@@ -3,7 +3,7 @@ const Joi = require('joi')
 const convert = require('joi-to-json-schema')
 const j2s = require('joi-to-swagger')
 
-const getAllDirs = (modelPath = '../model') => {
+const swagger = (modelPath = '../model') => {
   const items = fs.readdirSync(modelPath)
   // let reg = /\.\w+$/
   items.map(item => {
@@ -43,4 +43,4 @@ const getAllDirs = (modelPath = '../model') => {
   return items
 }
 
-console.log('------->', getAllDirs())
+console.log('------->', swagger())
