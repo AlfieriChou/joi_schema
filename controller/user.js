@@ -8,5 +8,13 @@ module.exports = {
       console.log('------->', params)
       res.json('hello')
     }
+  },
+  create: {
+    validate: User.create.validate,
+    handler: (req, res) => {
+      const params = req.body
+      console.log('------>', params)
+      res.json('world')
+    }
   }
 }
