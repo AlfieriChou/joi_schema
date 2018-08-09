@@ -49,14 +49,13 @@ const generateSwagger = (modelPath = './model') => {
       if (model[index].validate.body) {
         params = convert(Joi.object(model[index].validate.body))
         const required = params.required
-        console.log('------->', required)
         for (let prop in params.properties) {
           let field = {}
           field.name = prop
           field.in = 'body'
           field.description = params.properties[prop].description
           field.type = params.properties[prop].type
-          field.required = required.indexOf(prop) ? true : false
+          field.required = required.indexOf(prop) === -1 ? false : true
           content.parameters.push(field)
         }
       }
