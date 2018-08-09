@@ -9,32 +9,32 @@ const generateSwagger = (modelPath = './model') => {
   let methods = []
   items.forEach(item => {
     let model = require('../model/' + item)
-    for(let x in model) {
+    for(let index in model) {
       content = {
-        tags: model[x].tags,
-        summary: model[x].summary,
-        description: model[x].description
+        tags: model[index].tags,
+        summary: model[index].summary,
+        description: model[index].description
       }
-      if (model[x].validate.params) {
-        params = j2s(Joi.object(model[x].validate.params)).swagger
+      if (model[index].validate.params) {
+        params = j2s(Joi.object(model[index].validate.params)).swagger
         content.parameters = params
       }
-      if (model[x].validate.headers) {
-        headers = j2s(Joi.object(model[x].validate.headers)).swagger
+      if (model[index].validate.headers) {
+        headers = j2s(Joi.object(model[index].validate.headers)).swagger
         content.headers = headers
       }
-      if (model[x].validate.body) {
-        body = j2s(Joi.object(model[x].validate.body)).swagger
+      if (model[index].validate.body) {
+        body = j2s(Joi.object(model[index].validate.body)).swagger
         content.body = body
       }
-      content.responses = {'200': convert(model[x].output.body)}
+      content.responses = {'200': convert(model[index].output.body)}
 
       let swaggerMethod = {}
-      swaggerMethod[(model[x].method).toString()] = content
+      swaggerMethod[(model[index].method).toString()] = content
       
       let swaggerItem = {}
-      swaggerItem[(model[x].path).toString()] = swaggerMethod
-      
+      swaggerItem[(model[index].path).toString()] = swaggerMethod
+
       methods.push(swaggerItem)
     }
   })
