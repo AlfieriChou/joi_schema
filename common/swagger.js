@@ -1,7 +1,6 @@
 const fs = require('fs')
 const Joi = require('joi')
 const convert = require('joi-to-json-schema')
-const j2s = require('joi-to-swagger')
 const _ = require('lodash')
 
 const generateSwagger = (modelPath = './model') => {
@@ -14,26 +13,55 @@ const generateSwagger = (modelPath = './model') => {
       content = {
         tags: model[index].tags,
         summary: model[index].summary,
-        description: model[index].description
+        description: model[index].description,
+        parameters: []
       }
 
       // TODO: 传入数据存在问题
       if (model[index].validate.params) {
-        params = j2s(Joi.object(model[index].validate.params)).swagger
-        content.parameters = params
+        params = convert(Joi.object(model[index].validate.params))
+        for (let prop in params.properties) {
+          let field = {}
+          field.uniqueItems = true
+          field.name = prop
+          field.in = 'query'
+          field.description = params.properties[prop].description
+          field.type = params.properties[prop].type
+          field.required = false
+          content.parameters.push(field)
+        }
       }
 
       if (model[index].validate.headers) {
-        headers = j2s(Joi.object(model[index].validate.headers)).swagger
-        content.headers = headers
+        params = convert(Joi.object(model[index].validate.headers))
+        for (let prop in params.properties) {
+          let field = {}
+          field.uniqueItems = true
+          field.name = prop
+          field.in = 'header'
+          field.description = params.properties[prop].description
+          field.type = params.properties[prop].type
+          field.required = false
+          content.parameters.push(field)
+        }
       }
 
       if (model[index].validate.body) {
-        body = j2s(Joi.object(model[index].validate.body)).swagger
-        content.body = body
+        params = convert(Joi.object(model[index].validate.body))
+        const required = params.required
+        console.log('------->', required)
+        for (let prop in params.properties) {
+          let field = {}
+          field.name = prop
+          field.in = 'body'
+          field.description = params.properties[prop].description
+          field.type = params.properties[prop].type
+          field.required = required.indexOf(prop) ? true : false
+          content.parameters.push(field)
+        }
       }
 
-      content.responses = {'200': convert(model[index].output.body)}
+      content.responses = {"200" : convert(model[index].output.body)}
 
       let swaggerMethod = {}
       swaggerMethod[(model[index].method).toString()] = content

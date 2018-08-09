@@ -17,7 +17,7 @@ module.exports = {
     validate: {
       params: {
         phone: Joi.string().description('手机号'),
-        password: Joi.string().description('密码').required()
+        password: Joi.string().description('密码')
       }
     },
     output: {
