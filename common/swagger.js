@@ -5,6 +5,7 @@ const j2s = require('joi-to-swagger')
 const _ = require('lodash')
 
 const generateSwagger = (modelPath = './model') => {
+  // TODO: 未考虑文件夹下嵌套文件夹
   const items = fs.readdirSync(modelPath)
   let methods = []
   items.forEach(item => {
@@ -15,18 +16,23 @@ const generateSwagger = (modelPath = './model') => {
         summary: model[index].summary,
         description: model[index].description
       }
+
+      // TODO: 传入数据存在问题
       if (model[index].validate.params) {
         params = j2s(Joi.object(model[index].validate.params)).swagger
         content.parameters = params
       }
+
       if (model[index].validate.headers) {
         headers = j2s(Joi.object(model[index].validate.headers)).swagger
         content.headers = headers
       }
+
       if (model[index].validate.body) {
         body = j2s(Joi.object(model[index].validate.body)).swagger
         content.body = body
       }
+
       content.responses = {'200': convert(model[index].output.body)}
 
       let swaggerMethod = {}
