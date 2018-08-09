@@ -4,13 +4,10 @@ const convert = require('joi-to-json-schema')
 const j2s = require('joi-to-swagger')
 const _ = require('lodash')
 
-const modelList = (modelPath = './model') => {
+const generateSwagger = (modelPath = './model') => {
   const items = fs.readdirSync(modelPath)
-  let reg = /\.\w+$/
-  let method = []
-  items.map(item => {
-    item = item.toString()
-    item = item.replace(reg, '')
+  let methods = []
+  items.forEach(item => {
     let model = require('../model/' + item)
     for(let x in model) {
       content = {
@@ -37,32 +34,23 @@ const modelList = (modelPath = './model') => {
       
       let swaggerItem = {}
       swaggerItem[(model[x].path).toString()] = swaggerMethod
-      method.push(swaggerItem)
+      
+      methods.push(swaggerItem)
     }
   })
-  return method
-}
 
-const mergePath = () => {
-  const method = modelList()
-  if (!Array.isArray(method)) throw new Error('method mast be array!!!')
   let mergeMethod = {}
-  for (let i = 0; i < method.length; ++i) {
-    mergeMethod = _.merge(mergeMethod, method[i])
+  for (let i = 0; i < methods.length; ++i) {
+    mergeMethod = _.merge(mergeMethod, methods[i])
   }
-  return mergeMethod
-}
 
-const generateSwagger = () => {
   let swagger = {}
   swagger.swagger = '2.0'
   swagger.info = {
     'title': 'API document',
     'version': 'v3'
   }
-  const paths = mergePath()
-  if (typeof paths !== 'object') throw new Error('paths mast be object!!!')
-  swagger.paths = paths
+  swagger.paths = mergeMethod
   return swagger
 }
 
