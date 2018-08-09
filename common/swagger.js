@@ -4,7 +4,7 @@ const convert = require('joi-to-json-schema')
 const j2s = require('joi-to-swagger')
 const _ = require('lodash')
 
-const modelList = (modelPath = '../model') => {
+const modelList = (modelPath = './model') => {
   const items = fs.readdirSync(modelPath)
   let reg = /\.\w+$/
   let method = []
@@ -66,5 +66,6 @@ const generateSwagger = () => {
   return swagger
 }
 
-const data = generateSwagger()
-console.log('----->', data)
+module.exports = {
+  generateSwagger
+}
