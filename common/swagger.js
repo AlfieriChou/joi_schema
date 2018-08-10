@@ -24,69 +24,80 @@ const generateSwagger = (modelPath = './model') => {
         }
       } else {
         content = {
-        tags: model[index].tags,
-        summary: model[index].summary,
-        description: model[index].description,
-        parameters: []
-      }
-
-      if (model[index].validate.params) {
-        params = convert(Joi.object(model[index].validate.params))
-        for (let prop in params.properties) {
-          let field = {}
-          field.name = prop
-          field.in = 'query'
-          field.description = params.properties[prop].description
-          field.type = params.properties[prop].type
-          field.required = false
-          content.parameters.push(field)
+          tags: model[index].tags,
+          summary: model[index].summary,
+          description: model[index].description,
+          parameters: []
         }
-      }
 
-      if (model[index].validate.headers) {
-        params = convert(Joi.object(model[index].validate.headers))
-        for (let prop in params.properties) {
-          let field = {}
-          field.name = prop
-          field.in = 'header'
-          field.description = params.properties[prop].description
-          field.items = {
-            'type' : params.properties[prop].type
+        if (model[index].validate.params) {
+          params = convert(Joi.object(model[index].validate.params))
+          for (let prop in params.properties) {
+            let field = {}
+            field.name = prop
+            field.in = 'query'
+            field.description = params.properties[prop].description
+            field.type = params.properties[prop].type
+            field.required = false
+            content.parameters.push(field)
           }
-          field.required = false
-          content.parameters.push(field)
         }
-      }
 
-      if (model[index].validate.body) {
-        params = convert(Joi.object(model[index].validate.body))
-        const required = params.required
-        for (let prop in params.properties) {
-          let field = {}
-          field.name = prop
-          field.in = 'body'
-          field.description = params.properties[prop].description
-          field.schema = {
-            'type' : params.properties[prop].type
+        if (model[index].validate.headers) {
+          params = convert(Joi.object(model[index].validate.headers))
+          for (let prop in params.properties) {
+            let field = {}
+            field.name = prop
+            field.in = 'header'
+            field.description = params.properties[prop].description
+            field.items = {
+              'type' : params.properties[prop].type
+            }
+            field.required = false
+            content.parameters.push(field)
           }
-          field.schema.items = {
-            'type' : params.properties[prop].type
-          }
-          field.required = required.indexOf(prop) > -1 ? true : false
-          content.parameters.push(field)
         }
-      }
 
-      // TODO response存在Schema格式问题
-      content.responses = {"200" : convert(model[index].output.body)}
+        if (model[index].validate.body) {
+          params = convert(Joi.object(model[index].validate.body))
+          const required = params.required
+          for (let prop in params.properties) {
+            let field = {}
+            field.name = prop
+            field.in = 'body'
+            field.description = params.properties[prop].description
+            field.schema = {
+              'type' : params.properties[prop].type
+            }
+            // field.schema.items = {
+            //   'type' : params.properties[prop].type
+            // }
+            field.required = required.indexOf(prop) > -1 ? true : false
+            content.parameters.push(field)
+          }
+        }
 
-      let swaggerMethod = {}
-      swaggerMethod[(model[index].method).toString()] = content
-      
-      let swaggerItem = {}
-      swaggerItem[(model[index].path).toString()] = swaggerMethod
+        // TODO response存在Schema格式问题
+        content.responses = {
+          200: {
+            description: 'response success',
+            content: {
+              'application/json': {
+                schema: {
+                  body: convert(Joi.object(model[index].output))
+                }
+              } 
+            }
+          }
+        }
 
-      methods.push(swaggerItem)
+        let swaggerMethod = {}
+        swaggerMethod[(model[index].method).toString()] = content
+        
+        let swaggerItem = {}
+        swaggerItem[(model[index].path).toString()] = swaggerMethod
+
+        methods.push(swaggerItem)
       }
     }
   })
