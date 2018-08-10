@@ -9,12 +9,19 @@ const generateSwagger = (modelPath = './model') => {
   let methods = []
   items.forEach(item => {
     let model = require('../model/' + item)
-    let schema = {}
+    let schema = []
     for(let index in model) {
-      // TODO 未考虑Schema问题
+      
       if (index === 'schema') {
-        schema = convert(model[index])
-        console.log('------->', schema)
+        modelSchema = convert(model[index])
+        for (let prop in modelSchema.properties) {
+          let field = {}
+          field.name = prop
+          field.items = {
+            'type' : modelSchema.properties[prop].type 
+          }
+          schema.push(field)
+        }
       } else {
         content = {
         tags: model[index].tags,
@@ -70,6 +77,7 @@ const generateSwagger = (modelPath = './model') => {
         }
       }
 
+      // TODO response存在Schema格式问题
       content.responses = {"200" : convert(model[index].output.body)}
 
       let swaggerMethod = {}
