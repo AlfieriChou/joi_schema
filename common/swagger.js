@@ -4,25 +4,29 @@ const convert = require('joi-to-json-schema')
 const _ = require('lodash')
 
 const generateSwagger = (modelPath = './model') => {
-  // TODO: 未考虑文件夹下嵌套文件夹
+  // TODO 未考虑文件夹下嵌套文件夹
   const items = fs.readdirSync(modelPath)
   let methods = []
   items.forEach(item => {
     let model = require('../model/' + item)
+    let schema = {}
     for(let index in model) {
-      content = {
+      // TODO 未考虑Schema问题
+      if (index === 'schema') {
+        schema = convert(model[index])
+        console.log('------->', schema)
+      } else {
+        content = {
         tags: model[index].tags,
         summary: model[index].summary,
         description: model[index].description,
         parameters: []
       }
 
-      // TODO: 传入数据存在问题
       if (model[index].validate.params) {
         params = convert(Joi.object(model[index].validate.params))
         for (let prop in params.properties) {
           let field = {}
-          field.uniqueItems = true
           field.name = prop
           field.in = 'query'
           field.description = params.properties[prop].description
@@ -36,11 +40,12 @@ const generateSwagger = (modelPath = './model') => {
         params = convert(Joi.object(model[index].validate.headers))
         for (let prop in params.properties) {
           let field = {}
-          field.uniqueItems = true
           field.name = prop
           field.in = 'header'
           field.description = params.properties[prop].description
-          field.type = params.properties[prop].type
+          field.items = {
+            'type' : params.properties[prop].type
+          }
           field.required = false
           content.parameters.push(field)
         }
@@ -54,8 +59,13 @@ const generateSwagger = (modelPath = './model') => {
           field.name = prop
           field.in = 'body'
           field.description = params.properties[prop].description
-          field.type = params.properties[prop].type
-          field.required = required.indexOf(prop) === -1 ? false : true
+          field.schema = {
+            'type' : params.properties[prop].type
+          }
+          field.schema.items = {
+            'type' : params.properties[prop].type
+          }
+          field.required = required.indexOf(prop) > -1 ? true : false
           content.parameters.push(field)
         }
       }
@@ -69,6 +79,7 @@ const generateSwagger = (modelPath = './model') => {
       swaggerItem[(model[index].path).toString()] = swaggerMethod
 
       methods.push(swaggerItem)
+      }
     }
   })
 

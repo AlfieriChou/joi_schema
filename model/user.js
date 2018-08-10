@@ -7,7 +7,10 @@ const props = {
   password: Joi.string().description('密码')
 }
 
+const schema = Joi.object().keys(props).description('用户信息表')
+
 module.exports = {
+  schema,
   index: {
     path: '/users',
     method: 'get',
