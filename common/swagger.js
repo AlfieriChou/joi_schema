@@ -26,11 +26,11 @@ const generateSwagger = (modelPath = './model') => {
         content = {
           tags: model[index].tags,
           summary: model[index].summary,
-          description: model[index].description,
-          parameters: []
+          description: model[index].description
         }
 
         if (model[index].validate.params) {
+          content.parameters = []
           params = convert(Joi.object(model[index].validate.params))
           for (let prop in params.properties) {
             let field = {}
@@ -44,6 +44,7 @@ const generateSwagger = (modelPath = './model') => {
         }
 
         if (model[index].validate.headers) {
+          content.parameters = []
           params = convert(Joi.object(model[index].validate.headers))
           for (let prop in params.properties) {
             let field = {}
@@ -59,35 +60,24 @@ const generateSwagger = (modelPath = './model') => {
         }
 
         if (model[index].validate.body) {
+          content.parameters = []
           params = convert(Joi.object(model[index].validate.body))
-          const required = params.required
-          for (let prop in params.properties) {
-            let field = {}
-            field.name = prop
-            field.in = 'body'
-            field.description = params.properties[prop].description
-            field.schema = {
-              'type' : params.properties[prop].type
-            }
-            // field.schema.items = {
-            //   'type' : params.properties[prop].type
-            // }
-            field.required = required.indexOf(prop) > -1 ? true : false
-            content.parameters.push(field)
+          let field = {}
+          field.in = 'body'
+          field.name = 'create'
+          field.description = 'create'
+          field.schema = {
+            'type' : params.type,
+            'required' : params.required,
+            'properties' : params.properties
           }
+          content.parameters.push(field)
         }
 
         // TODO response存在Schema格式问题
         content.responses = {
           200: {
-            description: 'response success',
-            content: {
-              'application/json': {
-                schema: {
-                  body: convert(Joi.object(model[index].output))
-                }
-              } 
-            }
+            description: 'response success'
           }
         }
 
