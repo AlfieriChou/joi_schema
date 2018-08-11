@@ -37,8 +37,8 @@ module.exports = {
     path: '/users',
     method: 'post',
     tags: ['users'],
-    summary: '创建用户列表',
-    description: '创建用户列表信息',
+    summary: '创建用户',
+    description: '创建用户信息',
     validate: {
       body: {
         phone: Joi.string().description('手机号').required(),

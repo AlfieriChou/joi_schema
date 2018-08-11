@@ -65,7 +65,7 @@ const generateSwagger = (modelPath = './model') => {
           let field = {}
           field.in = 'body'
           field.name = 'create'
-          field.description = 'create'
+          field.description = model[index].description
           field.schema = {
             'type' : params.type,
             'required' : params.required,
