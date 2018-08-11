@@ -9,6 +9,11 @@ const port = process.env.PORT || 4000
 app.use(BodyParser.urlencoded({ extended: true}))
 app.use(BodyParser.json())
 
+app.use(express.static(__dirname + '/public'))
+app.set('views', __dirname + '/public')
+app.engine('html', require('ejs').renderFile)
+app.set('view engine', 'html')
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*")
   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE')
