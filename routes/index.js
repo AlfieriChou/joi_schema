@@ -9,6 +9,5 @@ api.get('/users', celebrate(user.index.validate), user.index.handler)
 api.post('/users', celebrate(user.create.validate), user.create.handler)
 
 api.get('/swagger.json', swagger.index.handler)
-api.get('/apidoc', swagger.doc.handler)
 
 module.exports = api

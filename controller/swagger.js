@@ -6,10 +6,5 @@ module.exports = {
       const data = swagger.generateSwagger()
       res.json(data)
     }
-  },
-  doc: {
-    handler: (req, res) => {
-      res.render('swagger/index.html', { url: '/swagger.json' })
-    }
   }
 }
