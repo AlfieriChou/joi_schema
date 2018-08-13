@@ -18,7 +18,7 @@ module.exports = {
     summary: '获取标签列表',
     description: '获取标签列表信息，通过不同的查询条件得到不同的查询结果',
     validate: {
-      params: _.pick(props, ['tag_name'])
+      query: _.pick(props, ['tag_name'])
     },
     output: {
       body: Joi.object({
@@ -50,7 +50,7 @@ module.exports = {
     summary: '更新标签信息',
     description: '更新标签信息',
     validate: {
-      path: {
+      params: {
         id: Joi.number().integer().description('id').required()
       },
       body: {

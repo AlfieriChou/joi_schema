@@ -7,19 +7,21 @@ const generateSwagger = (modelPath = './model') => {
   // TODO 未考虑文件夹下嵌套文件夹
   const items = fs.readdirSync(modelPath)
   let methods = []
+  let definitions = {}
   items.forEach(item => {
     let model = require('../model/' + item)
-    let schema = {}
-    for(let index in model) {
-      
+    item = item.replace(/\.\w+$/, '')
+        let schemaName = item.slice(0, 1).toUpperCase() + item.slice(1)
+    for (let index in model) {
+    
       if (index === 'schema') {
         modelSchema = convert(model[index])
-        schema = {
-          'User' : {
-            'type' : 'object',
-            'properties' : modelSchema.properties
-          }
+        let schema = {}
+        schema[schemaName] = {
+          'type' : 'object',
+          'properties' : modelSchema.properties
         }
+        definitions = _.merge(definitions, schema)
       } else {
         content = {
           tags: model[index].tags,
@@ -29,7 +31,7 @@ const generateSwagger = (modelPath = './model') => {
         }
 
         if (model[index].validate.query) {
-          params = convert(Joi.object(model[index].validate.params))
+          params = convert(Joi.object(model[index].validate.query))
           for (let prop in params.properties) {
             let field = {}
             field.name = prop
@@ -42,14 +44,14 @@ const generateSwagger = (modelPath = './model') => {
         }
 
         if (model[index].validate.params) {
-          params = convert(Joi.object(model[index].validate.path))
+          params = convert(Joi.object(model[index].validate.params))
           for (let prop in params.properties) {
             let field = {}
             field.name = prop
             field.in = 'path'
             field.description = params.properties[prop].description
             field.type = params.properties[prop].type
-            field.required = (params.required).indexOf(prop) > -1 ? true : false
+            field.required = true
             content.parameters.push(field)
           }
         }
@@ -64,7 +66,7 @@ const generateSwagger = (modelPath = './model') => {
             field.items = {
               'type' : params.properties[prop].type
             }
-            field.required = false
+            field.required = true
             content.parameters.push(field)
           }
         }
@@ -83,10 +85,15 @@ const generateSwagger = (modelPath = './model') => {
           content.parameters.push(field)
         }
 
-        // TODO response存在Schema格式问题
         content.responses = {
           200: {
-            'description' : 'response success'
+            'description' : 'response success',
+            'schema' : {
+              'type' : 'array',
+              'items': {
+                $ref: `#/definitions/${schemaName}`
+              }
+            }
           }
         }
 
@@ -95,7 +102,6 @@ const generateSwagger = (modelPath = './model') => {
         
         let swaggerItem = {}
         swaggerItem[(model[index].path).toString()] = swaggerMethod
-
         methods.push(swaggerItem)
       }
     }
@@ -113,6 +119,7 @@ const generateSwagger = (modelPath = './model') => {
     'version': 'v3'
   }
   swagger.paths = mergeMethod
+  swagger.definitions = definitions
   return swagger
 }
 
