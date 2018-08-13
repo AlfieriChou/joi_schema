@@ -28,7 +28,7 @@ const generateSwagger = (modelPath = './model') => {
           parameters : []
         }
 
-        if (model[index].validate.params) {
+        if (model[index].validate.query) {
           params = convert(Joi.object(model[index].validate.params))
           for (let prop in params.properties) {
             let field = {}
@@ -41,7 +41,7 @@ const generateSwagger = (modelPath = './model') => {
           }
         }
 
-        if (model[index].validate.path) {
+        if (model[index].validate.params) {
           params = convert(Joi.object(model[index].validate.path))
           for (let prop in params.properties) {
             let field = {}
