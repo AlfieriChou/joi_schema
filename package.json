@@ -23,10 +23,10 @@
   "homepage": "https://github.com/AlfieriChou/joi_schema#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "celebrate": "^8.0.1",
+    "celebrate": "^9.0.1",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
-    "joi": "^13.5.2",
+    "joi": "^14.0.6",
     "joi-to-json-schema": "^3.3.0",
     "lodash": "^4.17.10",
     "morgan": "^1.9.0",
